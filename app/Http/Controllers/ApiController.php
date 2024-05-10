@@ -15,26 +15,8 @@ class ApiController
     {
 //        User::create(['name'=>1,'email'=>1,'password'=>1]);
         Log::info('hello', ['data' => 'something']);
-        return User::get();
+        return response()->json(['data' => 'hello']);
     }
-
-//#[Prefix('api')]
-//class UserController extends Controller
-//{
-//    #[get('/users')]
-//    public function all()
-//    {
-//        $users = User::all();
-//        return $users;
-//    }
-//    #[get('/users2')]
-//    public function add()
-//    {
-//        User::create(['name'=>2,'email'=>2,'password'=>2]);
-//        return 'User added';
-//    }
-//
-//}
 
 
 }

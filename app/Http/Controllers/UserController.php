@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Exceptions\AuthException;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\Log;
 use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Post;
 use Spatie\RouteAttributes\Attributes\Prefix;
@@ -32,20 +33,24 @@ class UserController extends Controller
         return response()->json(['user' => $user]);
     }
 
+
+    /**
+     * @throws AuthException
+     */
     #[Get('login')]
     public function login(Request $request)
     {
+        Log::info('hello', ['data' => 'something']);
         $request->validate([
             'email' => 'required|email',
             'password' => 'required',
         ]);
 
+        Log::info($request);
         $user = User::where('email', $request->email)->first();
-
+        Log::info($user);
         if (!$user || !Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['邮箱或密码不正确'],
-            ]);
+            throw new AuthException(AuthException::PASSWORD_ERROR);
         }
 
         return response()->json(['user' => $user]);
@@ -73,5 +78,6 @@ class UserController extends Controller
 
         return response()->json(['user' => $user]);
     }
+
 
 }
