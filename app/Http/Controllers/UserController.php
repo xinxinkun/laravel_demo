@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Log;
 use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Post;
 use Spatie\RouteAttributes\Attributes\Prefix;
+use Laravel\Sanctum\HasApiTokens;
 
 #[Prefix('user')]
 class UserController extends Controller
@@ -18,10 +19,11 @@ class UserController extends Controller
     #[Post('register')]
     public function register(Request $request)
     {
+        Log::info($request);
         $request->validate([
             'name' => 'required|max:255',
             'email' => 'required|email|unique:users',
-            'password' => 'required|min:8|confirmed',
+            'password' => 'required|min:6|confirmed',
         ]);
 
         $user = User::create([
@@ -40,7 +42,6 @@ class UserController extends Controller
     #[Get('login')]
     public function login(Request $request)
     {
-        Log::info('hello', ['data' => 'something']);
         $request->validate([
             'email' => 'required|email',
             'password' => 'required',
@@ -48,24 +49,20 @@ class UserController extends Controller
 
         Log::info($request);
         $user = User::where('email', $request->email)->first();
-        Log::info($user);
         if (!$user || !Hash::check($request->password, $user->password)) {
-            throw new AuthException(AuthException::PASSWORD_ERROR);
+            throw new AuthException(AuthException::PASSWORD_ERROR, "账号或密码错误", null);
         }
+        // 创建 token
+        $token = $user->createToken('authToken')->plainTextToken;
 
-        return response()->json(['user' => $user]);
+        return response()->json(['user' => $user, 'token' => $token]);
     }
 
     #[Get('update')]
     public function update(Request $request)
     {
-        $request->validate([
-            'name' => 'required|max:255',
-            'email' => 'required|email|unique:users,email,' . $request->user()->id,
-            'password' => 'nullable|min:8|confirmed',
-        ]);
-
         $user = $request->user();
+        Log::info($user);
 
         $user->name = $request->name;
         $user->email = $request->email;
