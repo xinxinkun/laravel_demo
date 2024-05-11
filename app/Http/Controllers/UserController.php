@@ -39,7 +39,7 @@ class UserController extends Controller
     /**
      * @throws AuthException
      */
-    #[Get('login')]
+    #[Get('login','user.login')]
     public function login(Request $request)
     {
         $request->validate([
@@ -58,15 +58,19 @@ class UserController extends Controller
         return response()->json(['user' => $user, 'token' => $token]);
     }
 
-    #[Get('update')]
+    #[Get('profile', 'user.profile', ['auth:sanctum'])]
+    public function profile(Request $request){return $request->user();}
+
+    #[Get('update','user.update',['auth:sanctum'])]
     public function update(Request $request)
     {
         $user = $request->user();
-        Log::info($user);
+        Log::info("用户信息",$user);
 
-        $user->name = $request->name;
-        $user->email = $request->email;
-
+        if($request->name){
+            $user->name = $request->name;
+        }
+        if($request->has('email')) {$user->email = $request->input('email');}
         if ($request->password) {
             $user->password = Hash::make($request->password);
         }
