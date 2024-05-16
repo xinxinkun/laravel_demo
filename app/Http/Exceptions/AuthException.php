@@ -31,4 +31,6 @@ class AuthException extends BasicException
     const GROUP_MAX_CONFIRMED_DEPOSIT_ORDER_AMOUNT = 10;
 
     const GROUP_MAX_CANCELLED_WITHDRAWAL_ORDER_AMOUNT = 11;
+
+
 }

@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Log;
 use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Post;
 use Spatie\RouteAttributes\Attributes\Prefix;
-use Laravel\Sanctum\HasApiTokens;
 
 #[Prefix('user')]
 class UserController extends Controller
@@ -70,7 +69,9 @@ class UserController extends Controller
         if($request->name){
             $user->name = $request->name;
         }
-        if($request->has('email')) {$user->email = $request->input('email');}
+        if($request->has('email')) {
+            $user->email = $request->input('email');
+        }
         if ($request->password) {
             $user->password = Hash::make($request->password);
         }

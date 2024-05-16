@@ -1,11 +1,15 @@
 <?php
 
+use App\Exceptions\AuthenticateException;
 use App\Http\Exceptions\AuthException;
+use App\Http\Middleware\ApiResponseFormat;
+use App\Http\Middleware\Authenticate;
 use App\Http\Responses\ApiResponse;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\ValidationException;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -14,7 +18,10 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-//        $middleware->append(EnsureTokenIsValid::class);
+        $middleware->append(ApiResponseFormat::class);
+        $middleware->alias([
+            'auth' => Authenticate::class
+        ]);
         //
     })
     ->withExceptions(function (Exceptions $exceptions) {
@@ -25,11 +32,14 @@ return Application::configure(basePath: dirname(__DIR__))
                 'Validation failed'
             ));
         });
+
         $exceptions->render(function (AuthException $e, Request $request) {
+            $message = json_encode($e->getMessage(), JSON_UNESCAPED_UNICODE);
+            Log::info($message);
             return response(new ApiResponse(
+                null,
                 $e->getCode(),
-                $e->getMessage(),
-                $e->getData()
+                $message,
             ));
         });
     })->create();
