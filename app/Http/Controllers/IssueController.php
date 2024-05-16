@@ -8,9 +8,11 @@ use App\Models\Issue;
 use App\Models\IssueUser;
 use App\Models\Tag;
 use App\Servcies\IssueService;
+use Eastown\Pagination\RequestPagination;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Log;
+use Spatie\RouteAttributes\Attributes\Get;
 use Spatie\RouteAttributes\Attributes\Post;
 use Spatie\RouteAttributes\Attributes\Prefix;
 
@@ -100,6 +102,19 @@ class IssueController extends Controller
         return $query->toSql();
         $issues = $query->paginate($perPage);
         return response()->json(['issues' => $issues]);
+    }
+
+    #[Get('/issues', 'issue.list', ['auth:sanctum'])]
+    public function getList(Request $request)
+    {
+        $userId = $request->user()->id;
+        $query = Issue::with(['comments:id,content,issue_id', 'tags'])
+            ->where(function ($query) use ($userId) {
+                $query->where('creator_id', $userId)->orWhereHas('issueUsers', function ($query) use ($userId) {
+                    $query->where('user_id', $userId);
+                });
+            });
+        return (new RequestPagination($query))->request($request)->paginate();
     }
 
     private function validateIssueOwner(Request $request, Issue $issue)

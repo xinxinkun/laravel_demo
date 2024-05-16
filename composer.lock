@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "6f785b84b27a118961b9fe124e5676f9",
+    "content-hash": "6d52eab25bc316c9e69061cb1c82b810",
     "packages": [
         {
             "name": "brick/math",
@@ -438,6 +438,50 @@
                 }
             ],
             "time": "2023-08-10T19:36:49+00:00"
+        },
+        {
+            "name": "eastown/laravel-pagination",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/eastown/laravel-pagination.git",
+                "reference": "c53f286069011987f3480523f39a1975bb69fefc"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/eastown/laravel-pagination/zipball/c53f286069011987f3480523f39a1975bb69fefc",
+                "reference": "c53f286069011987f3480523f39a1975bb69fefc",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/database": "^5|^6|^7|^8|^9|^10|^11",
+                "illuminate/http": "^5|^6|^7|^8|^9|^10|^11",
+                "illuminate/support": "^5|^6|^7|^8|^9|^10|^11",
+                "php": ">=7.0.0"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Eastown\\Pagination\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Eastown",
+                    "email": "eastown111@gmail.com"
+                }
+            ],
+            "description": "Pagination for laravel",
+            "support": {
+                "issues": "https://github.com/eastown/laravel-pagination/issues",
+                "source": "https://github.com/eastown/laravel-pagination/tree/master"
+            },
+            "time": "2024-05-16T11:20:36+00:00"
         },
         {
             "name": "egulias/email-validator",
@@ -8338,7 +8382,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "eastown/laravel-pagination": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
