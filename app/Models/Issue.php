@@ -21,13 +21,12 @@ class Issue extends Model
         return $this->hasMany(IssueUser::class);
     }
 
-    public function issueTags()
-    {
-        return $this->hasMany(IssueTag::class);
-    }
-
     public function tags()
     {
         return $this->belongsToMany(Tag::class, 'issue_tags');
+    }
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
     }
 }
