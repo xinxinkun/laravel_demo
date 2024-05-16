@@ -6,6 +6,7 @@ use App\Http\Exceptions\AuthException;
 use App\Http\Responses\ApiResponse;
 use App\Models\Issue;
 use App\Models\IssueUser;
+use App\Models\Tag;
 use App\Servcies\IssueService;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
@@ -83,11 +84,27 @@ class IssueController extends Controller
     #[Post('list', 'issue.list', ['auth:sanctum'])]
     public function list(Request $request)
     {
+        $tag = $request->get('tag');
+        if ($tag && !Tag::where('name', $tag)->exists()) {
+            return response()->json(['issues' => []]);
+        }
+
         $userId = $request->user()->id;
         $perPage = $request->get('per_page', 10);
-        $issues = Issue::where('creator_id', $userId)->orWhereHas('issueUsers', function ($query) use ($userId) {
-            $query->where('user_id', $userId);
-        })->paginate($perPage);
+        $query = Issue::where('creator_id', $userId)
+            ->orWhereHas('issueUsers', function ($query) use ($userId) {
+                $query->where('user_id', $userId);
+            });
+
+        if ($tag) {
+            $query->whereHas('tags', function ($query) use ($tag) {
+                $query->where('name', $tag);
+            });
+        }
+        $issues = $query->leftjoin('issue_tags', 'issues.id', '=', 'issue_tags.issue_id')
+            ->leftjoin('tags', 'issue_tags.tag_id', '=', 'tags.id')
+            ->orderBy('tags.name', 'desc')
+            ->paginate($perPage);
         return response()->json(['issues' => $issues]);
     }
 
