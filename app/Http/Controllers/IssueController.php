@@ -84,14 +84,20 @@ class IssueController extends Controller
     #[Post('list', 'issue.list', ['auth:sanctum'])]
     public function list(Request $request)
     {
+        $tags = $request->input('tags');
 
         $userId = $request->user()->id;
         $perPage = $request->get('per_page', 10);
-        $query = Issue::with(['comments:id,content,issue_id','tags'])
-            ->where('creator_id', $userId)
-            ->orWhereHas('issueUsers', function ($query) use ($userId) {
-                $query->where('user_id', $userId);
+        $query = Issue::with(['comments:id,content,issue_id', 'tags'])
+            ->where(function ($query) use ($userId) {
+                $query->where('creator_id', $userId)->orWhereHas('issueUsers', function ($query) use ($userId) {
+                    $query->where('user_id', $userId);
+                });
+            })
+            ->whereHas('tags', function ($query) use ($tags) {
+                $query->whereIn('name', $tags);
             });
+        return $query->toSql();
         $issues = $query->paginate($perPage);
         return response()->json(['issues' => $issues]);
     }
